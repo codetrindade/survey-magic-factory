@@ -4,14 +4,30 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Star } from "lucide-react";
+
+const StarRating = ({ value, onChange, max = 5 }) => {
+  return (
+    <div className="flex">
+      {[...Array(max)].map((_, index) => (
+        <Star
+          key={index}
+          className={`h-6 w-6 cursor-pointer ${
+            index < value ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+          }`}
+          onClick={() => onChange(index + 1)}
+        />
+      ))}
+    </div>
+  );
+};
 
 const CreateSurvey = () => {
   const [surveyTitle, setSurveyTitle] = useState('');
   const [questions, setQuestions] = useState([]);
 
   const addQuestion = () => {
-    setQuestions([...questions, { type: 'text', question: '', options: [] }]);
+    setQuestions([...questions, { type: 'text', question: '', options: [], maxRating: 5 }]);
   };
 
   const removeQuestion = (index) => {
@@ -87,6 +103,7 @@ const CreateSurvey = () => {
                       <SelectItem value="text">Text</SelectItem>
                       <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
                       <SelectItem value="checkbox">Checkbox</SelectItem>
+                      <SelectItem value="starRating">Star Rating</SelectItem>
                     </SelectContent>
                   </Select>
                   {(question.type === 'multipleChoice' || question.type === 'checkbox') && (
@@ -102,6 +119,21 @@ const CreateSurvey = () => {
                       <Button onClick={() => addOption(index)} variant="outline" size="sm">
                         Add Option
                       </Button>
+                    </div>
+                  )}
+                  {question.type === 'starRating' && (
+                    <div className="space-y-2">
+                      <Label htmlFor={`max-rating-${index}`}>Max Rating</Label>
+                      <Input
+                        id={`max-rating-${index}`}
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={question.maxRating}
+                        onChange={(e) => handleQuestionChange(index, 'maxRating', parseInt(e.target.value, 10))}
+                      />
+                      <Label>Preview:</Label>
+                      <StarRating value={0} onChange={() => {}} max={question.maxRating} />
                     </div>
                   )}
                 </div>
