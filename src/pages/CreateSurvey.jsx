@@ -3,19 +3,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlusCircle, Trash2 } from "lucide-react";
 
 const CreateSurvey = () => {
   const [surveyTitle, setSurveyTitle] = useState('');
   const [questions, setQuestions] = useState([]);
 
   const addQuestion = () => {
-    setQuestions([...questions, { type: 'text', question: '' }]);
+    setQuestions([...questions, { type: 'text', question: '', options: [] }]);
   };
 
-  const handleQuestionChange = (index, value) => {
+  const removeQuestion = (index) => {
+    const updatedQuestions = questions.filter((_, i) => i !== index);
+    setQuestions(updatedQuestions);
+  };
+
+  const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[index].question = value;
+    updatedQuestions[index][field] = value;
+    setQuestions(updatedQuestions);
+  };
+
+  const addOption = (questionIndex) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIndex].options.push('');
+    setQuestions(updatedQuestions);
+  };
+
+  const handleOptionChange = (questionIndex, optionIndex, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIndex].options[optionIndex] = value;
     setQuestions(updatedQuestions);
   };
 
@@ -44,15 +62,50 @@ const CreateSurvey = () => {
               />
             </div>
             {questions.map((question, index) => (
-              <div key={index}>
-                <Label htmlFor={`question-${index}`}>Question {index + 1}</Label>
-                <Input
-                  id={`question-${index}`}
-                  value={question.question}
-                  onChange={(e) => handleQuestionChange(index, e.target.value)}
-                  placeholder="Enter question"
-                />
-              </div>
+              <Card key={index} className="p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <Label htmlFor={`question-${index}`}>Question {index + 1}</Label>
+                  <Button variant="destructive" size="icon" onClick={() => removeQuestion(index)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    id={`question-${index}`}
+                    value={question.question}
+                    onChange={(e) => handleQuestionChange(index, 'question', e.target.value)}
+                    placeholder="Enter question"
+                  />
+                  <Select
+                    value={question.type}
+                    onValueChange={(value) => handleQuestionChange(index, 'type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select question type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="text">Text</SelectItem>
+                      <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
+                      <SelectItem value="checkbox">Checkbox</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(question.type === 'multipleChoice' || question.type === 'checkbox') && (
+                    <div className="space-y-2">
+                      {question.options.map((option, optionIndex) => (
+                        <Input
+                          key={optionIndex}
+                          value={option}
+                          onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                          placeholder={`Option ${optionIndex + 1}`}
+                        />
+                      ))}
+                      <Button onClick={() => addOption(index)} variant="outline" size="sm">
+                        Add Option
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </Card>
             ))}
           </div>
         </CardContent>
