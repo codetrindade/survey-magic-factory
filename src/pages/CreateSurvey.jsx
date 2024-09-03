@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, Trash2, Star, Upload } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const StarRating = ({ value, onChange, max = 5 }) => {
   return (
@@ -160,13 +161,13 @@ const CreateSurvey = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="text">Text</SelectItem>
+                      <SelectItem value="uniqueChoice">Unique Choice</SelectItem>
                       <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
-                      <SelectItem value="checkbox">Checkbox</SelectItem>
                       <SelectItem value="starRating">Star Rating</SelectItem>
                       <SelectItem value="emojiRating">Emoji Rating</SelectItem>
                     </SelectContent>
                   </Select>
-                  {(question.type === 'multipleChoice' || question.type === 'checkbox') && (
+                  {(question.type === 'uniqueChoice' || question.type === 'multipleChoice') && (
                     <div className="space-y-2">
                       {question.options.map((option, optionIndex) => (
                         <Input
@@ -211,6 +212,19 @@ const CreateSurvey = () => {
                       </div>
                       <Label>Preview:</Label>
                       <EmojiRating value={-1} onChange={() => {}} emojis={question.emojis} />
+                    </div>
+                  )}
+                  {question.type === 'uniqueChoice' && question.options.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Preview:</Label>
+                      <RadioGroup>
+                        {question.options.map((option, optionIndex) => (
+                          <div key={optionIndex} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={`option-${index}-${optionIndex}`} />
+                            <Label htmlFor={`option-${index}-${optionIndex}`}>{option}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
                     </div>
                   )}
                 </div>
