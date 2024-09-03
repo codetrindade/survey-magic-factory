@@ -22,12 +22,30 @@ const StarRating = ({ value, onChange, max = 5 }) => {
   );
 };
 
+const EmojiRating = ({ value, onChange, emojis }) => {
+  return (
+    <div className="flex space-x-2">
+      {emojis.map((emoji, index) => (
+        <span
+          key={index}
+          className={`text-2xl cursor-pointer ${index === value ? 'scale-125' : ''}`}
+          onClick={() => onChange(index)}
+        >
+          {emoji}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 const CreateSurvey = () => {
   const [surveyTitle, setSurveyTitle] = useState('');
   const [questions, setQuestions] = useState([]);
 
+  const defaultEmojis = ['😡', '😕', '😐', '🙂', '😄'];
+
   const addQuestion = () => {
-    setQuestions([...questions, { type: 'text', question: '', options: [], maxRating: 5 }]);
+    setQuestions([...questions, { type: 'text', question: '', options: [], maxRating: 5, emojis: defaultEmojis }]);
   };
 
   const removeQuestion = (index) => {
@@ -50,6 +68,12 @@ const CreateSurvey = () => {
   const handleOptionChange = (questionIndex, optionIndex, value) => {
     const updatedQuestions = [...questions];
     updatedQuestions[questionIndex].options[optionIndex] = value;
+    setQuestions(updatedQuestions);
+  };
+
+  const handleEmojiChange = (questionIndex, emojiIndex, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIndex].emojis[emojiIndex] = value;
     setQuestions(updatedQuestions);
   };
 
@@ -104,6 +128,7 @@ const CreateSurvey = () => {
                       <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
                       <SelectItem value="checkbox">Checkbox</SelectItem>
                       <SelectItem value="starRating">Star Rating</SelectItem>
+                      <SelectItem value="emojiRating">Emoji Rating</SelectItem>
                     </SelectContent>
                   </Select>
                   {(question.type === 'multipleChoice' || question.type === 'checkbox') && (
@@ -134,6 +159,23 @@ const CreateSurvey = () => {
                       />
                       <Label>Preview:</Label>
                       <StarRating value={0} onChange={() => {}} max={question.maxRating} />
+                    </div>
+                  )}
+                  {question.type === 'emojiRating' && (
+                    <div className="space-y-2">
+                      <Label>Customize Emojis:</Label>
+                      <div className="flex space-x-2">
+                        {question.emojis.map((emoji, emojiIndex) => (
+                          <Input
+                            key={emojiIndex}
+                            value={emoji}
+                            onChange={(e) => handleEmojiChange(index, emojiIndex, e.target.value)}
+                            className="w-12 text-center"
+                          />
+                        ))}
+                      </div>
+                      <Label>Preview:</Label>
+                      <EmojiRating value={-1} onChange={() => {}} emojis={question.emojis} />
                     </div>
                   )}
                 </div>
