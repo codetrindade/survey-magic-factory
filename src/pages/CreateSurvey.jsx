@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, Trash2, Star, Upload } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 
 const StarRating = ({ value, onChange, max = 5 }) => {
   return (
@@ -36,6 +37,23 @@ const EmojiRating = ({ value, onChange, emojis }) => {
         </span>
       ))}
     </div>
+  );
+};
+
+const StyledOptionButton = ({ children, selected, onClick }) => {
+  return (
+    <button
+      className={cn(
+        "w-full p-4 mb-2 text-left rounded-lg shadow-sm transition-all duration-200 ease-in-out",
+        "hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50",
+        selected
+          ? "bg-blue-500 text-white hover:bg-blue-600"
+          : "bg-white text-gray-700 border border-gray-300"
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 };
 
@@ -217,14 +235,17 @@ const CreateSurvey = () => {
                   {question.type === 'uniqueChoice' && question.options.length > 0 && (
                     <div className="space-y-2">
                       <Label>Preview:</Label>
-                      <RadioGroup>
+                      <div className="space-y-2">
                         {question.options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="flex items-center space-x-2">
-                            <RadioGroupItem value={option} id={`option-${index}-${optionIndex}`} />
-                            <Label htmlFor={`option-${index}-${optionIndex}`}>{option}</Label>
-                          </div>
+                          <StyledOptionButton
+                            key={optionIndex}
+                            selected={false}
+                            onClick={() => {}}
+                          >
+                            {option}
+                          </StyledOptionButton>
                         ))}
-                      </RadioGroup>
+                      </div>
                     </div>
                   )}
                 </div>
