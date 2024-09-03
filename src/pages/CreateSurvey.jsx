@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Trash2, Star } from "lucide-react";
+import { PlusCircle, Trash2, Star, Upload } from "lucide-react";
 
 const StarRating = ({ value, onChange, max = 5 }) => {
   return (
@@ -41,6 +41,7 @@ const EmojiRating = ({ value, onChange, emojis }) => {
 const CreateSurvey = () => {
   const [surveyTitle, setSurveyTitle] = useState('');
   const [questions, setQuestions] = useState([]);
+  const [logoUrl, setLogoUrl] = useState('');
 
   const defaultEmojis = ['😡', '😕', '😐', '🙂', '😄'];
 
@@ -78,8 +79,19 @@ const CreateSurvey = () => {
   };
 
   const handleSaveSurvey = () => {
-    console.log('Survey saved:', { title: surveyTitle, questions });
+    console.log('Survey saved:', { title: surveyTitle, questions, logoUrl });
     // Here you would typically send this data to your backend
+  };
+
+  const handleLogoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoUrl(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -88,7 +100,7 @@ const CreateSurvey = () => {
       <Card>
         <CardHeader>
           <CardTitle>Survey Details</CardTitle>
-          <CardDescription>Enter the title for your new survey and add questions.</CardDescription>
+          <CardDescription>Enter the title for your new survey, upload a logo, and add questions.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -101,6 +113,29 @@ const CreateSurvey = () => {
                 placeholder="Enter survey title"
               />
             </div>
+            <div>
+              <Label htmlFor="logo-upload">Upload Logo</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="logo-upload"
+                  type="file"
+                  onChange={handleLogoUpload}
+                  accept="image/*"
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                />
+                <Button onClick={() => document.getElementById('logo-upload').click()} variant="outline">
+                  <Upload className="mr-2 h-4 w-4" /> Upload
+                </Button>
+              </div>
+            </div>
+            {logoUrl && (
+              <div>
+                <Label>Logo Preview</Label>
+                <div className="mt-2 border rounded-md p-2">
+                  <img src={logoUrl} alt="Survey Logo" className="max-h-32 mx-auto" />
+                </div>
+              </div>
+            )}
             {questions.map((question, index) => (
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-center mb-2">
